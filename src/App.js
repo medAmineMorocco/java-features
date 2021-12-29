@@ -117,7 +117,7 @@ function App() {
                                 <Tag color={versionsColors[version]}>Java {version}</Tag>
                             </>}
                                   actions={[
-                                      ...tipLink ? [<PictureOutlined onClick={() => handleTipVisible(tipLink)}/>] : [],
+                                      ...tipLink ? [<Tooltip title="Explanation"><PictureOutlined onClick={() => handleTipVisible(tipLink)}/></Tooltip>] : [],
                                       <Tooltip title="Official Documentation"><a href={link} target="_blank" rel="noreferrer"><LinkOutlined /></a></Tooltip>,
                                   ]}
                             >
