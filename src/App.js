@@ -1,8 +1,8 @@
-import {Layout, AutoComplete, Switch, Select, Card, Col, Row, Tag, Avatar, Image} from 'antd';
-import {TwitterOutlined, MediumOutlined} from '@ant-design/icons';
-import {initialFeatures, javaVersions, versionsColors, options} from "./data";
+import React, {useState} from "react";
+import {Layout, AutoComplete, Switch, Select, Card, Col, Row, Tag, Avatar, Image, Tooltip, Popover, Modal} from 'antd';
+import {TwitterOutlined, MediumOutlined, LinkOutlined, PictureOutlined} from '@ant-design/icons';
+import {initialFeatures, javaVersions, versionsColors, options, stagesColors, stagesDefinitions} from "./data";
 import './App.css';
-import {useState} from "react";
 
 function App() {
 
@@ -10,6 +10,8 @@ function App() {
     const [features, setFeatures] = useState(initialFeatures);
     const [selectedVersion, setSelectedVersion] = useState('all');
     const [autocompleteOptions, setAutocompleteOptions] = useState(options);
+    const [tipVisible, setTipVisible] = useState(false);
+    const [tip, setTip] = useState();
 
     function handleSwitchChange(value) {
         if (value) {
@@ -48,6 +50,11 @@ function App() {
         } else {
             setFeatures(initialFeatures.filter(({version}) => version === byVersion));
         }
+    }
+
+    function handleTipVisible(link) {
+        setTipVisible(true);
+        setTip(link);
     }
 
     return (
@@ -103,13 +110,35 @@ function App() {
 
                 <Row gutter={16}>
 
-                    {features.map(({title, description, version}) =>
+                    {features.map(({title, description, version, stage, link, tipLink}) =>
                         <Col xs={24} sm={12} md={8} lg={8} xl={6} className='col' key={title}>
-                            <Card title={title} bordered={false} extra={<Tag color={versionsColors[version]}>Java {version}</Tag>}>
+                            <Card title={title} bordered={false} extra={<>
+                                {stage && <Popover placement='bottom' color={stagesColors[stage]} overlayClassName="stage-popover" content={stagesDefinitions[stage]} trigger="click"><Tag color={stagesColors[stage]} className="stage-tag">{stage}</Tag></Popover>}
+                                <Tag color={versionsColors[version]}>Java {version}</Tag>
+                            </>}
+                                  actions={[
+                                      ...tipLink ? [<PictureOutlined onClick={() => handleTipVisible(tipLink)}/>] : [],
+                                      <Tooltip title="Official Documentation"><a href={link} target="_blank" rel="noreferrer"><LinkOutlined /></a></Tooltip>,
+                                  ]}
+                            >
                                 {description}
                             </Card>
                         </Col>)}
                 </Row>
+
+                <Modal
+                    centered
+                    visible={tipVisible}
+                    onCancel={() => setTipVisible(false)}
+                    footer={null}
+                    title={null}
+                    closable={false}
+                    bodyStyle={{padding: 0}}
+                >
+                    <div className='tip-container'>
+                        <Image src={tip} />
+                    </div>
+                </Modal>
             </Layout.Content>
 
             <Layout.Footer className='footer'>

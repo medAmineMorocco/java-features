@@ -101,6 +101,22 @@ body {
   color: #61dafb;
 }
 
+.stage-tag {
+  cursor: pointer;
+}
+
+.stage-popover {
+  width: 200px;
+}
+
+.stage-popover .ant-popover-content .ant-popover-inner .ant-popover-inner-content {
+  color: white;
+}
+
+.tip-container .ant-image {
+  display: block;
+}
+
 .revue-form-field {
   height: 38px;
   width: 300px;
