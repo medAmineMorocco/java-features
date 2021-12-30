@@ -31,18 +31,22 @@ function App() {
         setSelectedVersion(newVersion);
     }
 
-    function onSelectFeature(feature) {
-        console.log('feature', feature);
+    function handleSelect(feature) {
         setFeatures(initialFeatures.filter(({title}) => title === feature));
     }
 
-    const handleSearch = (value) => {
-        console.log('search', value);
+    function handleSearch(value) {
         if (value === '') {
+            setAutocompleteOptions(options);
             setFeatures(initialFeatures);
+        } else {
+            setAutocompleteOptions(options.filter(({options}) => options.map(option => option.value.toLowerCase()).find(val => val.includes(value.toLowerCase()))));
         }
-        setAutocompleteOptions(options.filter(({options}) => options.map(option => option.value.toLowerCase()).includes(value.toLowerCase())));
-    };
+    }
+
+    function handleFocus() {
+        setAutocompleteOptions(options);
+    }
 
     function filterFeaturesByVersion(byVersion) {
         if (byVersion === 'all') {
@@ -88,12 +92,13 @@ function App() {
                     <AutoComplete
                         allowClear={true}
                         disabled={mode === 'VERSION'}
-                        dropdownMatchSelectWidth={500}
+                        dropdownMatchSelectWidth={true}
                         style={{width: 250}}
                         options={autocompleteOptions}
                         placeholder='Example: Var'
-                        onSelect={onSelectFeature}
+                        onSelect={handleSelect}
                         onSearch={handleSearch}
+                        onFocus={handleFocus}
                     >
                     </AutoComplete>
 
