@@ -1,17 +1,37 @@
 import React, {useState} from "react";
-import {Layout, AutoComplete, Switch, Select, Card, Col, Row, Tag, Avatar, Image, Tooltip, Popover, Modal} from 'antd';
+import {Layout, AutoComplete, Switch, Select, Card, Col, Row, Tag, Avatar, Image, Tooltip, Popover, Modal, Button, Empty, Spin, Result} from 'antd';
 import {TwitterOutlined, MediumOutlined, LinkOutlined, PictureOutlined} from '@ant-design/icons';
-import {initialFeatures, javaVersions, versionsColors, options, stagesColors, stagesDefinitions} from "./data";
+import {javaVersions, versionsColors, groupBy, stagesColors, stagesDefinitions, renderTitle, renderItem} from "./data";
+import {useQuery} from "react-query";
 import './App.css';
+
+
 
 function App() {
 
     const [mode, setMode] = useState('VERSION');
-    const [features, setFeatures] = useState(initialFeatures);
+    const [features, setFeatures] = useState([]);
     const [selectedVersion, setSelectedVersion] = useState('all');
+    const [options, setOptions] = useState([]);
     const [autocompleteOptions, setAutocompleteOptions] = useState(options);
     const [tipVisible, setTipVisible] = useState(false);
     const [tip, setTip] = useState();
+
+
+    const { isLoading, isError, isSuccess, data } = useQuery('getFeatures', () => {
+        return fetch('https://run.mocky.io/v3/95a53de7-35b9-4371-bb05-655b795c4e63')
+            .then((resp) => resp.json());
+    }, {
+        onSuccess: (data) => {
+            setFeatures(data);
+            setOptions(Object.entries(groupBy(data, 'version')).map(([key, value]) => {
+                return {
+                    'label': renderTitle('Java ' + key),
+                    'options': value.map(({title}) => renderItem(title))
+                }
+            }));
+        }
+    });
 
     function handleSwitchChange(value) {
         if (value) {
@@ -19,7 +39,7 @@ function App() {
             filterFeaturesByVersion(selectedVersion);
         } else {
             setMode('FEATURE');
-            setFeatures(initialFeatures);
+            setFeatures(data);
         }
     }
 
@@ -32,13 +52,13 @@ function App() {
     }
 
     function handleSelect(feature) {
-        setFeatures(initialFeatures.filter(({title}) => title === feature));
+        setFeatures(data.filter(({title}) => title === feature));
     }
 
     function handleSearch(value) {
         if (value === '') {
             setAutocompleteOptions(options);
-            setFeatures(initialFeatures);
+            setFeatures(data);
         } else {
             setAutocompleteOptions(options.filter(({options}) => options.map(option => option.value.toLowerCase()).find(val => val.includes(value.toLowerCase()))));
         }
@@ -50,15 +70,52 @@ function App() {
 
     function filterFeaturesByVersion(byVersion) {
         if (byVersion === 'all') {
-            setFeatures(initialFeatures);
+            setFeatures(data);
         } else {
-            setFeatures(initialFeatures.filter(({version}) => version === byVersion));
+            setFeatures(data.filter(({version}) => version === byVersion));
         }
     }
 
     function handleTipVisible(link) {
         setTipVisible(true);
         setTip(link);
+    }
+
+    var content;
+
+    if (isLoading) {
+        content = <Spin />;
+    }
+
+    if (isError) {
+        content = <Result subTitle="Sorry, something went wrong." />;
+    }
+
+    if (isSuccess) {
+        content = features.length === 0
+            ?
+            <Empty image='https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg'
+                   imageStyle={{
+                       fontsize: 60,
+                   }}/>
+            :
+            features.map(({title, description, version, stage, link, tipLink}) =>
+                <Col xs={24} sm={12} md={8} lg={8} xl={6} className='col' key={title}>
+                    <Card title={title}
+                          bordered={false}
+                          extra={<>
+                              {stage && <Popover placement='bottom' color={stagesColors[stage]} overlayClassName="stage-popover" content={stagesDefinitions[stage]} trigger="click"><Tag color={stagesColors[stage]} className="stage-tag">{stage}</Tag></Popover>}
+                              <Tag color={versionsColors[version]}>Java {version}</Tag>
+                          </>}
+                          actions={[
+                              ...tipLink ? [<Tooltip title="Explanation"><PictureOutlined onClick={() => handleTipVisible(tipLink)}/></Tooltip>] : [],
+                              <Tooltip title="Official Documentation"><a href={link} target="_blank" rel="noreferrer"><LinkOutlined /></a></Tooltip>,
+                          ]}
+                          bodyStyle={{height: '180px', padding: '12px', fontFamily: 'Verdana', fontsize: '16px'}}
+                    >
+                        {description.length > 300 ? <span>{description.substr(0, 300)} <Popover placement='right' content={description.substr(300, description.length)} trigger="click"><Button type="link">More</Button></Popover></span> : description}
+                    </Card>
+                </Col>);
     }
 
     return (
@@ -113,22 +170,9 @@ function App() {
                     </Select>
                 </div>
 
-                <Row gutter={16}>
+                <Row gutter={16} {...(features.length ===0 && {style: {height: '90%', justifyContent: 'center', alignItems: 'center'}})}>
 
-                    {features.map(({title, description, version, stage, link, tipLink}) =>
-                        <Col xs={24} sm={12} md={8} lg={8} xl={6} className='col' key={title}>
-                            <Card title={title} bordered={false} extra={<>
-                                {stage && <Popover placement='bottom' color={stagesColors[stage]} overlayClassName="stage-popover" content={stagesDefinitions[stage]} trigger="click"><Tag color={stagesColors[stage]} className="stage-tag">{stage}</Tag></Popover>}
-                                <Tag color={versionsColors[version]}>Java {version}</Tag>
-                            </>}
-                                  actions={[
-                                      ...tipLink ? [<Tooltip title="Explanation"><PictureOutlined onClick={() => handleTipVisible(tipLink)}/></Tooltip>] : [],
-                                      <Tooltip title="Official Documentation"><a href={link} target="_blank" rel="noreferrer"><LinkOutlined /></a></Tooltip>,
-                                  ]}
-                            >
-                                {description}
-                            </Card>
-                        </Col>)}
+                    {content}
                 </Row>
 
                 <Modal

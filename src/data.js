@@ -1,11 +1,11 @@
 
 export const javaVersions = ['9', '10', '11', '15', '17', '18']
 
-const renderTitle = (title) => (
+export const renderTitle = (title) => (
     <span>{title}</span>
 );
 
-const renderItem = (title) => ({
+export const renderItem = (title) => ({
     value: title,
     label: (
         <div
@@ -18,7 +18,7 @@ const renderItem = (title) => ({
     ),
 });
 
-function groupBy(arr, criteria) {
+export function groupBy(arr, criteria) {
     const newObj = arr.reduce(function (acc, currentValue) {
         if (!acc[currentValue[criteria]]) {
             acc[currentValue[criteria]] = [];
@@ -49,54 +49,3 @@ export const stagesDefinitions = {
     'Incubating': 'Incubating Features are experimental APIs distributed in a form of separate modules with names prefixed with “jdk.incubator.”.',
     'Experimental': 'Experimental features represent early versions of (mostly) VM-level features, which can be risky, incomplete, or even unstable. In most cases, they need to be enabled using dedicated flags.',
 }
-
-export const initialFeatures = [
-    {
-        title: 'Record',
-        description: 'description',
-        version: '17',
-        stage: 'Preview',
-        link: 'https://bugs.openjdk.java.net/browse/JDK-8238361',
-        tipLink: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png'
-    },
-    {
-        title: 'Text Blocks',
-        description: 'description',
-        version: '15',
-        stage: 'Incubating',
-        link: 'https://bugs.openjdk.java.net/browse/JDK-8238361',
-        tipLink: 'https://sf.sports.fr/wp-content/uploads/2021/12/PANORAMIC_216279_0005-1-670x370.jpg'
-    },
-    {
-        title: 'Var',
-        description: 'description',
-        version: '9',
-        stage: 'Experimental',
-        link: 'https://bugs.openjdk.java.net/browse/JDK-8238361'
-    },
-    {
-        title: 'Factory Methods',
-        description: 'description',
-        version: '18',
-        link: 'https://bugs.openjdk.java.net/browse/JDK-8238361'
-    },
-    {
-        title: 'Http Client',
-        description: 'description',
-        version: '10',
-        link: 'https://bugs.openjdk.java.net/browse/JDK-8238361'
-    },
-    {
-        title: 'InstanceOf',
-        description: 'description',
-        version: '11',
-        link: 'https://bugs.openjdk.java.net/browse/JDK-8238361'
-    }
-];
-
-export const options = Object.entries(groupBy(initialFeatures, 'version')).map(([key, value]) => {
-    return {
-        'label': renderTitle('Java ' + key),
-        'options': value.map(({title}) => renderItem(title))
-    }
-});
