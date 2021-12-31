@@ -19,7 +19,7 @@ function App() {
 
 
     const { isLoading, isError, isSuccess, data } = useQuery('getFeatures', () => {
-        return fetch(window.__RUNTIME_CONFIG__.URL)
+        return fetch(window.__RUNTIME_CONFIG__.API_URL)
             .then((resp) => resp.json());
     }, {
         onSuccess: (data) => {
