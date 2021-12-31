@@ -11,10 +11,12 @@
     "react-dom": "^17.0.2",
     "react-query": "^3.34.7",
     "react-scripts": "5.0.0",
+    "runtime-env-cra": "^0.2.4",
     "web-vitals": "^2.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start:dev": "NODE_ENV=development runtime-env-cra --config-name=./public/runtime-env.js && react-scripts start",
+    "start": "NODE_ENV=prod runtime-env-cra --config-name=./public/runtime-env.js && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
