@@ -15,9 +15,8 @@
     "web-vitals": "^2.1.2"
   },
   "scripts": {
-    "start:dev": "NODE_ENV=development runtime-env-cra --config-name=./public/runtime-env.js && react-scripts start",
-    "start": "NODE_ENV=prod runtime-env-cra --config-name=./public/runtime-env.js && react-scripts start",
-    "build": "react-scripts build",
+    "start": "NODE_ENV=development runtime-env-cra --config-name=./public/runtime-env.js && react-scripts start",
+    "build": "runtime-env-cra --config-name=./public/runtime-env.js && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
